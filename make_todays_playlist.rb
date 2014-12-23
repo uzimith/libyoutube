@@ -32,7 +32,8 @@ channels = {
 }
 
 begin
-  puts "gether today's video"
+  # Gether
+  puts "### Gether today's video"
   today_videos = channels.map { |title,channel_id|
     res = client.execute!(
       api_method: youtube.search.list,
@@ -46,7 +47,9 @@ begin
     res.data.items.select {|i| i.snippet.published_at > 1.day.ago}.map {|i| [i.snippet.title, i.id.video_id]}
   }.flatten(1).to_h
 
-  puts "create playlist"
+  # Create playlist
+  puts
+  puts "### Create playlist"
   res = client.execute!(
     api_method: youtube.playlists.insert,
     parameters: {
@@ -59,35 +62,30 @@ begin
     }
   )
   playlist_id = res.data.id
-  puts "created:  id #{playlist_id}"
 
-  puts "insert the videos"
+  puts "Created:  id #{playlist_id}"
+
+  # Insert
+  puts
+  puts "### Insert the videos"
   today_videos.each do |title,video_id|
-    puts "#{playlist_id} => #{title}:#{video_id}"
+    puts "add: #{title}(#{video_id})"
     body = {
-      playlistId: playlist_id,
-      resouceId: {
-        kind: "youtube#video",
-        videoId: video_id
+      snippet: {
+        playlistId: playlist_id,
+        resourceId: {
+          kind: 'youtube#video',
+          videoId: video_id
+        }
       }
     }
-    p body
     res = client.execute!(
       api_method: youtube.playlist_items.insert,
       parameters: {
-        part: "snippet"
+        part: body.keys.join(',')
       },
-      body_object: {
-        snnipet: {
-          playlistId: playlist_id,
-          resouceId: {
-            kind: "youtube#video",
-            videoId: video_id
-          }
-        }
-      }
+      body_object: body
     )
-    p res.data.snnipet
   end
 rescue Google::APIClient::ClientError => e
   puts "error: #{e}"
