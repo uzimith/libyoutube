@@ -1,2 +1,2 @@
 # Youtube Library
-error: Playlist id not specified.
+Youtube TVで登録チャンネルのコレクションが使えなかったので、一定のチャンネルをまとめてみるプレイリストが欲しくなりました。
